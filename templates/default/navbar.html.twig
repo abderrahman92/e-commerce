@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello DefaultController!{% endblock %}
+
+{% block body %}
+  
+     
+        <h1>hello</h1>
+         <nav>
+            <ul>
+            <li><a href="{{ path ('produit')}}">produit</a></li>
+            <li><a href="{{ path ('panier')}}">panier</a></li>
+           
+            {% if app.user is not null %}
+            <li><a href="{{ path ('panier')}}">deconnection</a></li>
+     
+            {% endif %}
+
+            </ul>
+        </nav>
+ 
+
+{% endblock %}
