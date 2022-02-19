@@ -6,6 +6,7 @@
     <h1>Create new ContenuPanier</h1>
 
     {{ include('contenu_panier/_form.html.twig') }}
+     <td>{{ panier.id }}</td>
 
     <a href="{{ path('contenu_panier_index') }}">back to list</a>
 {% endblock %}

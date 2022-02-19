@@ -31,11 +31,12 @@
                 <th>Photo</th>
                 <td>{{ produit.photo }}</td>
             </tr>
+            
         </tbody>
     </table>
 
        {% if is_granted('ROLE_USER') %}
-      <a href="{{ path('panier_index') }}">ajouter au panier</a>
+      <a href="{{ path('contenu_panier_new',{'id': produit.id}) }}">ajouter au panier</a>
        {% endif %}
 
     <a href="{{ path('produit_index') }}">back to list</a>

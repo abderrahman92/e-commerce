@@ -1,10 +1,13 @@
 <?php
 
 namespace App\Controller;
-
+use App\Entity\Panier;
+use App\Entity\Produit;
+use App\Form\PanierType;
 use App\Entity\ContenuPanier;
 use App\Form\ContenuPanierType;
 use App\Repository\ContenuPanierRepository;
+use App\Repository\PanierRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,17 +18,33 @@ use Symfony\Component\Routing\Annotation\Route;
 class ContenuPanierController extends AbstractController
 {
     #[Route('/', name: 'contenu_panier_index', methods: ['GET'])]
-    public function index(ContenuPanierRepository $contenuPanierRepository): Response
+    public function index(ContenuPanierRepository $contenuPanierRepository,PanierRepository $panierRepository): Response
     {
+        $user= $this->getUser();
+        
+            $panier= $panierRepository->findBy(['utilisateur'=>$user]);
+     
         return $this->render('contenu_panier/index.html.twig', [
-            'contenu_paniers' => $contenuPanierRepository->findAll(),
+            'contenu_paniers' => $contenuPanierRepository->findBy(['panier'=>$panier]),
         ]);
     }
 
-    #[Route('/new', name: 'contenu_panier_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new/{id}', name: 'contenu_panier_new', methods: ['GET', 'POST'])]
+    public function new(int $id ,Produit $produit,Request $request,ContenuPanierRepository $contenuPanierRepository, EntityManagerInterface $entityManager,PanierRepository $panierRepository): Response
     {
+
+        
+        $panier = new Panier();
+        $panier->setDateAchat(new \DateTime()); 
+        $panier->setUtilisateur($this->getUser());
+        $panier->setEtat('0'); 
+        $entityManager->persist($panier);
+        $entityManager->flush();
+
         $contenuPanier = new ContenuPanier();
+        $contenuPanier->setDate(new \DateTime());  
+             
+
         $form = $this->createForm(ContenuPanierType::class, $contenuPanier);
         $form->handleRequest($request);
 
@@ -33,20 +52,35 @@ class ContenuPanierController extends AbstractController
             $entityManager->persist($contenuPanier);
             $entityManager->flush();
 
+            
+
             return $this->redirectToRoute('contenu_panier_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('contenu_panier/new.html.twig', [
             'contenu_panier' => $contenuPanier,
             'form' => $form,
+            'contenu_panier' => $contenuPanier,
+            'panier'=>$panier,
         ]);
     }
 
-    #[Route('/{id}', name: 'contenu_panier_show', methods: ['GET'])]
-    public function show(ContenuPanier $contenuPanier): Response
+    #[Route('/{id}', name: 'contenu_panier_show', methods: ['GET', 'POST'])]
+    public function show(Request $request,ContenuPanier $contenuPanier,EntityManagerInterface $entityManager): Response
     {
-        return $this->render('contenu_panier/show.html.twig', [
+        
+        $form = $this->createForm(ContenuPanierType::class, $contenuPanier);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            return $this->redirectToRoute('contenu_panier_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('contenu_panier/edit.html.twig', [
             'contenu_panier' => $contenuPanier,
+            'form' => $form,
         ]);
     }
 

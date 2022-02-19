@@ -105,6 +105,11 @@ class Produit
         return $this;
     }
 
+    public function __toString()
+    {
+        return $this->id;
+    }
+
     /**
      * @return Collection<int, ContenuPanier>
      */
@@ -148,6 +153,7 @@ if(file_exists(__DIR__.'/../../public/uploads/'.$this->photo)){
 return true;
 
 }
+
 
 
 

@@ -20,7 +20,7 @@ class ContenuPanier
     private $panier;
 
     #[ORM\Column(type: 'integer')]
-    private $quantité;
+    private $quantite;
 
     #[ORM\Column(type: 'date')]
     private $date;
@@ -54,14 +54,14 @@ class ContenuPanier
         return $this;
     }
 
-    public function getQuantité(): ?int
+    public function getQuantite(): ?int
     {
-        return $this->quantité;
+        return $this->quantite;
     }
 
-    public function setQuantité(int $quantité): self
+    public function setQuantite(int $quantite): self
     {
-        $this->quantité = $quantité;
+        $this->quantite = $quantite;
 
         return $this;
     }
@@ -76,5 +76,9 @@ class ContenuPanier
         $this->date = $date;
 
         return $this;
+    }
+    public function __toString()
+    {
+        return $this->id;
     }
 }

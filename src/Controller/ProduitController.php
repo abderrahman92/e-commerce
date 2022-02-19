@@ -5,6 +5,12 @@ namespace App\Controller;
 use App\Entity\Produit;
 use App\Form\ProduitType;
 use App\Repository\ProduitRepository;
+
+use App\Entity\ContenuPanier;
+use App\Form\ContenuPanierType;
+use App\Repository\ContenuPanierRepository;
+
+
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +30,7 @@ class ProduitController extends AbstractController
     }
 
     #[Route('produit/new', name: 'produit_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager,): Response
     {
         $produit = new Produit();
         $form = $this->createForm(ProduitType::class, $produit);
@@ -67,16 +73,26 @@ class ProduitController extends AbstractController
         ]);
     }
 
+
+
+
+
     #[Route('produit/{id}', name: 'produit_show', methods: ['GET'])]
-    public function show(Produit $produit): Response
+    public function show(Produit $produit,ContenuPanierRepository $ContenuPanierRepository): Response
     {
         return $this->render('produit/show.html.twig', [
             'produit' => $produit,
         ]);
+        
     }
 
+
+
+
+
+
     #[Route('produit/{id}/edit', name: 'produit_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Produit $produit, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Produit $produit, EntityManagerInterface $entityManager,): Response
     {
         $form = $this->createForm(ProduitType::class, $produit);
         $form->handleRequest($request);
@@ -92,6 +108,8 @@ class ProduitController extends AbstractController
             'form' => $form,
         ]);
     }
+
+
 
     #[Route('produit/{id}', name: 'produit_delete', methods: ['POST'])]
     public function delete(Request $request, Produit $produit, EntityManagerInterface $entityManager): Response
