@@ -17,10 +17,12 @@ class PanierController extends AbstractController
     #[Route('/', name: 'panier_index', methods: ['GET', 'POST'])]
     public function index(PanierRepository $panierRepository, EntityManagerInterface $entityManager): Response
     {
-        
+        $user=$this->getUser();
         return $this->render('panier/index.html.twig', [
             'paniers' => $panierRepository->findAll(),
+            'user'=>$user,
         ]);
+        
     }
 
     #[Route('/new', name: 'panier_new', methods: ['GET', 'POST'])]
@@ -49,9 +51,10 @@ class PanierController extends AbstractController
     public function show(Panier $panier,EntityManagerInterface $entityManager): Response
     {
 
-        $panier->setEtat('1');
+        $panier->setEtat('1');     
         $entityManager->persist($panier);
         $entityManager->flush();
+        $this->addFlash('success', 'article valider!');
 
          return $this->redirectToRoute('panier_index', [], Response::HTTP_SEE_OTHER);
         

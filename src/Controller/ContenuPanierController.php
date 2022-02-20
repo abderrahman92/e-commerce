@@ -22,13 +22,14 @@ class ContenuPanierController extends AbstractController
     public function index(ContenuPanierRepository $contenuPanierRepository,PanierRepository $panierRepository,EntityManagerInterface $entityManager): Response{
         $user= $this->getUser();
        
-       
         $panier= $panierRepository->findBy(['etat' => '0','utilisateur' => $user]);
+        $this->addFlash('success', 'comande valider!');
 
         return $this->render('contenu_panier/index.html.twig', [
             'contenu_paniers' => $contenuPanierRepository->findBy(['panier'=>$panier],),
             'id' => $contenuPanierRepository->findOneBy(['panier'=>$panier],),
         ]);
+        
     }
 
     #[Route('/{id}', name: 'contenu_panier_show', methods: ['GET', 'POST'])]
@@ -66,8 +67,11 @@ class ContenuPanierController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$contenuPanier->getId(), $request->request->get('_token'))) {
             $entityManager->remove($contenuPanier);
             $entityManager->flush();
+            $this->addFlash('error', 'contenu supprimer');
         }
 
         return $this->redirectToRoute('contenu_panier_index', [], Response::HTTP_SEE_OTHER);
     }
+
+
 }

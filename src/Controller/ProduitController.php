@@ -99,15 +99,15 @@ class ProduitController extends AbstractController
                 $entityManager->flush();
             }
 
-        //
-        //recuperation id du produit  de la route 
-        $post=$produitRepository->find($id);
-        $contenuPanier = new ContenuPanier();
-        $contenuPanier->setDate(new \DateTime()); 
-        $contenuPanier->setQuantite('20');  
-        $contenuPanier->setProduit($post);
-        $post2= $panierRepository->findOneBy(['etat' => '0','utilisateur' => $user]);
-        $contenuPanier->setPanier($post2);
+            //
+            //recuperation id du produit  de la route 
+            $post=$produitRepository->find($id);
+            $contenuPanier = new ContenuPanier();
+            $contenuPanier->setDate(new \DateTime()); 
+            $contenuPanier->setQuantite('20');  
+            $contenuPanier->setProduit($post);
+            $post2= $panierRepository->findOneBy(['etat' => '0','utilisateur' => $user]);
+            $contenuPanier->setPanier($post2);
         
 
             
@@ -115,6 +115,7 @@ class ProduitController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->addFlash('success', 'produit ajouter !');
             $entityManager->persist($contenuPanier);
             $entityManager->flush();
             
