@@ -51,7 +51,7 @@
                 <th>total</th>
 
                 <th>{{ id.produit.prix }}</th>
-                 <th> <a href="{{ path('panier_index', {'id':  id.panier.id}) }}">valider ma commande</a></th>
+                 <th> <a href="{{ path('panier_show', {'id':  id.panier.id}) }}">valider ma commande</a></th>
            </tr>      
                
             {% endif %}

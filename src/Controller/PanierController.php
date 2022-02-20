@@ -52,9 +52,9 @@ class PanierController extends AbstractController
         $panier->setEtat('1');
         $entityManager->persist($panier);
         $entityManager->flush();
-        return $this->render('panier/show.html.twig', [
-            'panier' => $panier,
-        ]);
+
+         return $this->redirectToRoute('panier_index', [], Response::HTTP_SEE_OTHER);
+        
     }
 
     #[Route('/{id}/edit', name: 'panier_edit', methods: ['GET', 'POST'])]

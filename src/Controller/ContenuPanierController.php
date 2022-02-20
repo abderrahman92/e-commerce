@@ -34,19 +34,11 @@ class ContenuPanierController extends AbstractController
     #[Route('/{id}', name: 'contenu_panier_show', methods: ['GET', 'POST'])]
     public function show(Request $request,ContenuPanier $contenuPanier,EntityManagerInterface $entityManager): Response
     {
-        
-        $form = $this->createForm(ContenuPanierType::class, $contenuPanier);
-        $form->handleRequest($request);
+        $panier= $panierRepository->findBy(['etat' => '0','utilisateur' => $user]);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('contenu_panier_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->renderForm('contenu_panier/edit.html.twig', [
-            'contenu_panier' => $contenuPanier,
-            'form' => $form,
+        return $this->render('contenu_panier/index.html.twig', [
+            'contenu_paniers' => $contenuPanierRepository->findBy(['panier'=>$panier],),
+            'id' => $contenuPanierRepository->findOneBy(['panier'=>$panier],),
         ]);
     }
 
