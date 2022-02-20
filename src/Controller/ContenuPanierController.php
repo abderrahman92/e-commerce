@@ -3,6 +3,7 @@
 namespace App\Controller;
 use App\Entity\Panier;
 use App\Entity\Produit;
+use App\Repository\ProduitRepository;
 use App\Form\PanierType;
 use App\Entity\ContenuPanier;
 use App\Form\ContenuPanierType;
@@ -18,50 +19,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class ContenuPanierController extends AbstractController
 {
     #[Route('/', name: 'contenu_panier_index', methods: ['GET'])]
-    public function index(ContenuPanierRepository $contenuPanierRepository,PanierRepository $panierRepository): Response
+    public function index(ContenuPanierRepository $contenuPanierRepository,PanierRepository $panierRepository,EntityManagerInterface $entityManager): Response
     {
         $user= $this->getUser();
-        
-            $panier= $panierRepository->findBy(['utilisateur'=>$user]);
+            $panier= $panierRepository->findBy(['etat' => '0','utilisateur' => $user]);
+            
      
         return $this->render('contenu_panier/index.html.twig', [
-            'contenu_paniers' => $contenuPanierRepository->findBy(['panier'=>$panier]),
-        ]);
-    }
-
-    #[Route('/new/{id}', name: 'contenu_panier_new', methods: ['GET', 'POST'])]
-    public function new(int $id ,Produit $produit,Request $request,ContenuPanierRepository $contenuPanierRepository, EntityManagerInterface $entityManager,PanierRepository $panierRepository): Response
-    {
-
-        
-        $panier = new Panier();
-        $panier->setDateAchat(new \DateTime()); 
-        $panier->setUtilisateur($this->getUser());
-        $panier->setEtat('0'); 
-        $entityManager->persist($panier);
-        $entityManager->flush();
-
-        $contenuPanier = new ContenuPanier();
-        $contenuPanier->setDate(new \DateTime());  
-             
-
-        $form = $this->createForm(ContenuPanierType::class, $contenuPanier);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($contenuPanier);
-            $entityManager->flush();
-
-            
-
-            return $this->redirectToRoute('contenu_panier_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->renderForm('contenu_panier/new.html.twig', [
-            'contenu_panier' => $contenuPanier,
-            'form' => $form,
-            'contenu_panier' => $contenuPanier,
-            'panier'=>$panier,
+            'contenu_paniers' => $contenuPanierRepository->findBy(['panier'=>$panier],),
+            'id' => $contenuPanierRepository->findOneBy(['panier'=>$panier],)
         ]);
     }
 
@@ -102,14 +68,14 @@ class ContenuPanierController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'contenu_panier_delete', methods: ['POST'])]
-    public function delete(Request $request, ContenuPanier $contenuPanier, EntityManagerInterface $entityManager): Response
+    #[Route('/delete/{id}', name: 'contenu_panier_delete', methods: ['POST'])]
+    public function delete(Request $request, Produit $produit, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$contenuPanier->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($contenuPanier);
+        if ($this->isCsrfTokenValid('delete'.$produit->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($produit);
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('contenu_panier_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('produit_index', [], Response::HTTP_SEE_OTHER);
     }
 }

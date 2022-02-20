@@ -81,4 +81,5 @@ class ContenuPanier
     {
         return $this->id;
     }
+    
 }

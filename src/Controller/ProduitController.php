@@ -6,10 +6,12 @@ use App\Entity\Produit;
 use App\Form\ProduitType;
 use App\Repository\ProduitRepository;
 
+use App\Entity\Panier;
+
 use App\Entity\ContenuPanier;
 use App\Form\ContenuPanierType;
 use App\Repository\ContenuPanierRepository;
-
+use App\Repository\PanierRepository;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -77,12 +79,55 @@ class ProduitController extends AbstractController
 
 
 
-    #[Route('produit/{id}', name: 'produit_show', methods: ['GET'])]
-    public function show(Produit $produit,ContenuPanierRepository $ContenuPanierRepository): Response
+    #[Route('produit/{id}', name: 'produit_show', methods: ['GET','POST'])]
+    public function show(int $id,Request $request,EntityManagerInterface $entityManager,Produit $produit, ProduitRepository $produitRepository,ContenuPanierRepository $ContenuPanierRepository,PanierRepository $panierRepository): Response
     {
-        return $this->render('produit/show.html.twig', [
+
+        $user= $this->getUser();
+        //rechercher l'utilisateur et l'etat dans le panier 
+        $valide= $panierRepository->findOneBy([
+            'etat' => '0',
+            'utilisateur' => $user,]);
+            //si il n'existe pas 
+            if (($valide == null)){
+                //creation du panier 
+                $panier = new Panier();
+                $panier->setDateAchat(new \DateTime()); 
+                $panier->setUtilisateur($this->getUser());
+                $panier->setEtat('0'); 
+                $entityManager->persist($panier);
+                $entityManager->flush();
+            }
+
+        //
+        //recuperation id du produit  de la route 
+        $post=$produitRepository->find($id);
+        $contenuPanier = new ContenuPanier();
+        $contenuPanier->setDate(new \DateTime()); 
+        $contenuPanier->setQuantite('20');  
+        $contenuPanier->setProduit($post);
+        $post2= $panierRepository->findOneBy(['etat' => '0','utilisateur' => $user]);
+        $contenuPanier->setPanier($post2);
+        
+
+            
+        $form = $this->createForm(ContenuPanierType::class, $contenuPanier);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($contenuPanier);
+            $entityManager->flush();
+            
+            return $this->redirectToRoute('produit_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('produit/show.html.twig', [
+            'contenu_panier' => $contenuPanier,
+            'form' => $form,
             'produit' => $produit,
         ]);
+       
+       
         
     }
 
@@ -111,7 +156,7 @@ class ProduitController extends AbstractController
 
 
 
-    #[Route('produit/{id}', name: 'produit_delete', methods: ['POST'])]
+    #[Route('/delete/{id}', name: 'produit_delete', methods: ['POST'])]
     public function delete(Request $request, Produit $produit, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$produit->getId(), $request->request->get('_token'))) {

@@ -3,39 +3,63 @@
 {% block title %}ContenuPanier index{% endblock %}
 
 {% block body %}
-    <h1>ContenuPanier index</h1>
+    <h1>Contenu de votre Panier </h1>
 
     <table class="table">
         <thead>
             <tr>
+        
                 <th>nom Produit</th>
                 <th>Quantité</th>
-                <th>
-                <p>prix du produit</p>
+                
+                <th>prix du produit</th>
 
-                </th>
-                <th>actions</th>
+
+                <th>total</th>
             </tr>
         </thead>
         <tbody>
+        
         {% for contenu_panier in contenu_paniers %}
+
+
             <tr>
                 <td>{{ contenu_panier.produit.nom }}</td>
                 <td>{{ contenu_panier.quantite }}</td>
                 <td>{{ contenu_panier.produit.prix }}</td>
-                <td>{{ contenu_panier.produit.prix|length }}</td>
                 <td>
-                    <a href="{{ path('contenu_panier_show', {'id': contenu_panier.id}) }}">show</a>
-                    <a href="{{ path('contenu_panier_edit', {'id': contenu_panier.id}) }}">edit</a>
+                        <form method="post" action="{{ path('contenu_panier_delete', {'id': contenu_panier.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ contenu_panier.id) }}">
+                            <button class="btn">Delete</button>
+                        </form>
+
+                         <a href="{{ path('contenu_panier_edit', {'id': contenu_panier.id}) }}">edit</a>
                 </td>
+                
+
+                 
+            </tr>
+            <tr>
+            <th>total</th>
             </tr>
         {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
         {% endfor %}
+       
+            </table>
+           {% if id is not null %}
+           <tr>
+                <th>total</th>
+
+                <th>{{ id.produit.prix }}</th>
+                 <th> <a href="{{ path('panier_edit', {'id':  id.panier.id}) }}">valider ma commande</a></th>
+           </tr>      
+               
+            {% endif %}
+             
+            
+ 
         </tbody>
-    </table>
+ 
 
 
 {% endblock %}

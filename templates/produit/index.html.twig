@@ -34,20 +34,21 @@
                 <td><img style="width:100px" src="{{ asset('/uploads/' ~ produit.photo) }}" alt=""></td>
                 {% endif %}
                 <td>
-                    <a href="{{ path('produit_show', {'id': produit.id}) }}">show</a>
+                    <a href="{{ path('produit_show', {'id': produit.id}) }}">ajouter</a>
                     {% if is_granted('ROLE_ADMIN') %}
                     <a href="{{ path('produit_edit', {'id': produit.id}) }}">edit</a>
-                    {% endif %}
+                   <form method="post" action="{{ path('produit_delete', {'id': produit.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ produit.id) }}">
+                    <button class="btn">Delete</button>
+                    </form>
+                     {% endif %}   
                 </td>
             </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">no records found</td>
-            </tr>
+        
         {% endfor %}
         </tbody>
     </table>
-        {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('produit_new') }}">Create new</a>
-        {% endif %}   
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('produit_new') }}">Create new</a>
+    {% endif %}   
 {% endblock %}
