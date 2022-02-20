@@ -46,8 +46,12 @@ class PanierController extends AbstractController
     }
 
     #[Route('/{id}', name: 'panier_show', methods: ['GET'])]
-    public function show(Panier $panier): Response
+    public function show(Panier $panier,EntityManagerInterface $entityManager): Response
     {
+
+        $panier->setEtat('1');
+        $entityManager->persist($panier);
+        $entityManager->flush();
         return $this->render('panier/show.html.twig', [
             'panier' => $panier,
         ]);

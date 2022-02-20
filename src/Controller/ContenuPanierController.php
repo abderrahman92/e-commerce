@@ -19,15 +19,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class ContenuPanierController extends AbstractController
 {
     #[Route('/', name: 'contenu_panier_index', methods: ['GET'])]
-    public function index(ContenuPanierRepository $contenuPanierRepository,PanierRepository $panierRepository,EntityManagerInterface $entityManager): Response
-    {
+    public function index(ContenuPanierRepository $contenuPanierRepository,PanierRepository $panierRepository,EntityManagerInterface $entityManager): Response{
         $user= $this->getUser();
-            $panier= $panierRepository->findBy(['etat' => '0','utilisateur' => $user]);
-            
-     
+       
+       
+        $panier= $panierRepository->findBy(['etat' => '0','utilisateur' => $user]);
+
         return $this->render('contenu_panier/index.html.twig', [
             'contenu_paniers' => $contenuPanierRepository->findBy(['panier'=>$panier],),
-            'id' => $contenuPanierRepository->findOneBy(['panier'=>$panier],)
+            'id' => $contenuPanierRepository->findOneBy(['panier'=>$panier],),
         ]);
     }
 
@@ -69,13 +69,13 @@ class ContenuPanierController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: 'contenu_panier_delete', methods: ['POST'])]
-    public function delete(Request $request, Produit $produit, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, ContenuPanier $contenuPanier, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$produit->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($produit);
+        if ($this->isCsrfTokenValid('delete'.$contenuPanier->getId(), $request->request->get('_token'))) {
+            $entityManager->remove($contenuPanier);
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('produit_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('contenu_panier_index', [], Response::HTTP_SEE_OTHER);
     }
 }
